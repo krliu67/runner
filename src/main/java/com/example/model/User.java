@@ -1,11 +1,8 @@
 package com.example.model;
 
-import com.example.utils.SensitiveConverter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
 import lombok.Data;
-import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -28,14 +25,14 @@ public class User implements Serializable {
     private String username;
 
     private String password;
-
+    // 头像地址
     private String avatarUrl;
-
+    // running score
     private Integer score;
-
+    // one and only
     private String inviteCode;
 
     private String signature;
-
+    // phone number
     private String phone;
 }
