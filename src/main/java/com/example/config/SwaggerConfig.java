@@ -23,13 +23,13 @@ public class SwaggerConfig {
     @Bean
     //测试API
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .apiInfo(apiInfo())
                 // ture 启用Swagger3.0， false 禁用（生产环境要禁用）
-                .enable(false)
+                .enable(true)
                 .select()
                 // 扫描的路径使用@Api的controller
-                .apis(RequestHandlerSelectors.basePackage("com.example.controller"))
+                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 // 指定路径处理PathSelectors.any()代表所有的路径
                 .paths(PathSelectors.any())
                 .build();

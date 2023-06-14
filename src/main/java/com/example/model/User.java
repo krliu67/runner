@@ -1,9 +1,11 @@
 package com.example.model;
 
+import com.example.utils.SensitiveConverter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,9 +22,8 @@ public class User implements Serializable {
     @Column(nullable = false,updatable = false)
     private Long id;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @Column(nullable = false,updatable = false)
-    private Long userId;
+    private String userId;
 
     private String username;
 
@@ -35,4 +36,6 @@ public class User implements Serializable {
     private String inviteCode;
 
     private String signature;
+
+    private String phone;
 }
