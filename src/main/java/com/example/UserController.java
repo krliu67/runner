@@ -39,7 +39,7 @@ public class UserController {
         User updateUser = userService.updateUser(user);
         return new ReturnData(200,updateUser,"update user successfully",1);
     }
-    // search more than one user
+    // Delete a user
     @DeleteMapping("/delete")
     public ReturnData deleteUser(String userId){
         userService.deleteEmployee(userId);
@@ -51,7 +51,7 @@ public class UserController {
         User user = userService.findUserByUserId(userId);
         return new ReturnData(200,user,"find sb successfully",1);
     }
-    // search more than one user
+    // search more than a user
     @GetMapping("/findMore/{userIds}")
     public ReturnData findUsers(@PathVariable("userIds") List<String> userIds){
         List<User> users = userService.findUserByUserIds(userIds);
