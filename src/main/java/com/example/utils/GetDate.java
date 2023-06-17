@@ -5,12 +5,12 @@ import java.util.Date;
 
 public class GetDate {
 
-    public java.sql.Date GetToday(){
+    public java.sql.Date getToday(){
         java.sql.Date curDate = new java.sql.Date(new Date().getTime());
         return curDate;
     }
 
-    public java.sql.Date GetYesterday(){
+    public java.sql.Date getYesterday(){
         java.sql.Date curDate = new java.sql.Date(new Date().getTime());
         //System.out.println(curDate.toString());
         Date dBefore = new Date();
