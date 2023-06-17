@@ -86,5 +86,9 @@ class RunnerDemoApplicationTests {
         System.out.println(userService.findUserByUserIds(list));
     }
 
-
+    @Test
+    void t(){
+        double result=1.0-0.9;
+        System.out.println(result);
+    }
 }
