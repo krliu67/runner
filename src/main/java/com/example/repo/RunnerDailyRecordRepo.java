@@ -12,7 +12,7 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
     @Query(value = "select sum(mile), sum(duration), sum(step), sum(calorie) from runner.runner_daily_record where user_id = ?1 and date = ?2", nativeQuery = true)
 //    @Query(value = "select * from runner.runner_daily_record where user_id = ?1 and date = ?2", nativeQuery = true)
     // 根据用户id和日期查询对应数据
-    public List<Object[]> getRecordByDay(String userId, Date date);
+    public String getRecordByDay(String userId, Date date);
 
 //    @Query(value = "select id,user_id,path, duration, mile, calorie,average_speed,average_step_frequency,max_speed,max_step_frequency," +
 //            "date,step_frequency,speed,weather,temperature from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)

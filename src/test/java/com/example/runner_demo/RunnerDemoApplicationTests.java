@@ -8,12 +8,14 @@ import com.example.service.RunnerDailyRecordService;
 import com.example.service.UserService;
 import com.example.utils.GenCode;
 import com.example.utils.GetDate;
+import com.example.utils.TimeUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,5 +113,20 @@ class RunnerDemoApplicationTests {
     void testGetTotalData(){
         String userId = "HiuxJFOw";
         System.out.println(runnerDailyRecordService.getTotalData(userId));
+    }
+
+    @Test
+    void testHOME(){
+        System.out.println(runnerDailyRecordRepo.getRecordByDay("BUOaQKUT", new GetDate().getToday()));
+        System.out.println(runnerDailyRecordService.getHomeData("BUOaQKUT"));
+    }
+
+    @Test
+    void testTIme2(){
+        long runtime1 = 0L;
+        runtime1 += Long.parseLong("133332");
+        String s = new TimeUtils().second2Time(runtime1);
+        java.sql.Time sqlT = Time.valueOf(s);
+        System.out.println(sqlT);
     }
 }
