@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.io.Serializable;
 import java.util.Optional;
 
 @Data
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler", "fieldHandler"})
 public class HomeData implements Serializable {
 
     @ApiModelProperty("標題")

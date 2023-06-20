@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.model.User;
 import com.example.repo.UserRepo;
+import com.example.utils.GenCode;
 import com.example.utils.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class UserService {
         String password = user.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
         user.setPassword(password);
+        user.setUserId(new GenCode().GenUserId());
         return userRepo.save(user);
     }
     public User updateUser(User user){

@@ -1,9 +1,13 @@
 package com.example.runner_demo;
 
+import com.example.dto.RunnerRankDto;
 import com.example.model.User;
+import com.example.repo.RunnerDailyRecordRepo;
 import com.example.repo.UserRepo;
+import com.example.service.RunnerDailyRecordService;
 import com.example.service.UserService;
 import com.example.utils.GenCode;
+import com.example.utils.GetDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 class RunnerDemoApplicationTests {
@@ -23,6 +28,11 @@ class RunnerDemoApplicationTests {
     @Autowired
     DataSource dataSource;
 
+    @Autowired
+    RunnerDailyRecordRepo runnerDailyRecordRepo;
+
+    @Autowired
+    RunnerDailyRecordService runnerDailyRecordService;
 
     @Test
     void contextLoads() {
@@ -87,8 +97,19 @@ class RunnerDemoApplicationTests {
     }
 
     @Test
-    void t(){
-        double result=1.0-0.9;
-        System.out.println(result);
+    void testRunnerDailyRecordRepo(){
+//        https://www.cnblogs.com/icyanbird/p/16076040.html
+        List<Object[]> list = runnerDailyRecordRepo.getAllRankFromTo(new GetDate().getAnoth(),new GetDate().getToday(),0,5);
+        List<RunnerRankDto> runnerRankDtos = list.stream().map(rank -> {
+            RunnerRankDto runnerRankDto = new RunnerRankDto((String) rank[0], (Double) rank[1], (String) rank[2], (String) rank[3], (String) rank[4]);
+            return runnerRankDto;
+        }).collect(Collectors.toList());
+        System.out.println(runnerRankDtos);
+    }
+
+    @Test
+    void testGetTotalData(){
+        String userId = "HiuxJFOw";
+        System.out.println(runnerDailyRecordService.getTotalData(userId));
     }
 }

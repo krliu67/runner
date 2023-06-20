@@ -1,6 +1,7 @@
 package com.example.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.util.JSONPObject;
@@ -21,6 +22,7 @@ import java.util.List;
 @Table(name = "runner_daily_record")
 @Entity
 @TypeDef(name="json",typeClass = JsonStringType.class)
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler", "fieldHandler"})
 public class RunnerDailyRecord implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -37,7 +39,7 @@ public class RunnerDailyRecord implements Serializable {
 
     // TODO 参考接口文档的 获取⾸⻚信息 + 上传跑步数据 处
 
-    @ApiModelProperty("記錄時間")
+    @ApiModelProperty("記錄日期")
     private Date date;
 
     @ApiModelProperty("跑步公里")
