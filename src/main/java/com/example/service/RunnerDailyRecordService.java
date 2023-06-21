@@ -1,11 +1,14 @@
 package com.example.service;
 
+import com.example.exception.DiyException;
+import com.example.exception.ErrorType;
 import com.example.model.HomeData;
 import com.example.model.RunnerDailyRecord;
 import com.example.dto.RunnerRankDto;
 import com.example.model.RunningData;
 import com.example.model.TotalData;
 import com.example.repo.RunnerDailyRecordRepo;
+import com.example.utils.BeanMapUtilByJson;
 import com.example.utils.GetDate;
 import com.example.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,7 @@ public class RunnerDailyRecordService {
         String[] yesdayStrs = yesterdayRecords.split(",");
         if (todayStrs[0].equals("null")){
             log.info("今天没有运动");
+            throw new DiyException(ErrorType.TODAY_NO_RUN);
         }else{
             mileData.setNowValue(Double.parseDouble(todayStrs[0]));
             long runtime1 = 0L;
@@ -65,6 +69,7 @@ public class RunnerDailyRecordService {
 
         if (yesdayStrs[0].equals("null")){
             log.info("昨天没有运动");
+            throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
         }else{
             mileData.setNowValue(Double.parseDouble(yesdayStrs[0]));
             long runtime2 = 0L;
@@ -101,10 +106,11 @@ public class RunnerDailyRecordService {
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
         // TODO 序列化Json问题
-        List<RunnerDailyRecord> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
-        List<RunningData> dataList = new ArrayList<>();
-        BeanUtils.copyProperties(records,dataList);
-        return dataList;
+        List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
+        List<RunningData> runningDataList = records.stream().map( data -> {
+            return (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
+        }).collect(Collectors.toList());
+        return runningDataList;
     }
 
     public List<RunnerRankDto> getAllRankFromTo(Date from_date, Date to_date,Integer start, Integer row){

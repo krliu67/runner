@@ -1,15 +1,19 @@
 package com.example.runner_demo;
 
 import com.example.dto.RunnerRankDto;
+import com.example.model.RunnerDailyRecord;
+import com.example.model.RunningData;
 import com.example.model.User;
 import com.example.repo.RunnerDailyRecordRepo;
 import com.example.repo.UserRepo;
 import com.example.service.RunnerDailyRecordService;
 import com.example.service.UserService;
-import com.example.utils.GenCode;
-import com.example.utils.GetDate;
-import com.example.utils.TimeUtils;
+import com.example.utils.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -128,5 +132,25 @@ class RunnerDemoApplicationTests {
         String s = new TimeUtils().second2Time(runtime1);
         java.sql.Time sqlT = Time.valueOf(s);
         System.out.println(sqlT);
+    }
+
+    @Test
+    void testGetRecordFromTo() throws Exception {
+        List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo("BUOaQKUT",new GetDate().getAnoth(),new GetDate().getToday());
+        Map<String,Object> map = records.get(0);
+        String str = map.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue())
+                .collect(Collectors.joining("\n"));
+//        System.out.println(str);
+        //
+        RunningData runningData = (RunningData) BeanMapUtilByJson.mapToBean(map,RunningData.class);
+        System.out.println(runningData);
+//
+        List<RunningData> runningDataList = records.stream().map( data -> {
+            System.out.println(data);
+            RunningData temp = (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
+            return temp;
+        }).collect(Collectors.toList());
+        System.out.println(runningDataList);
     }
 }

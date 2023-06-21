@@ -3,17 +3,13 @@ package com.example.service;
 import com.example.model.User;
 import com.example.repo.UserRepo;
 import com.example.utils.GenCode;
-import com.example.utils.ReturnData;
+import com.example.common.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserService {

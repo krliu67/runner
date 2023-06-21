@@ -1,12 +1,11 @@
 package com.example;
 
-import com.example.utils.ReturnData;
+import com.example.common.ReturnData;
 import com.example.model.User;
 import com.example.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

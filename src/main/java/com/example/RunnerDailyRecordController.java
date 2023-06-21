@@ -4,7 +4,7 @@ import com.example.dto.RunnerRankDto;
 import com.example.model.RunningData;
 import com.example.service.RunnerDailyRecordService;
 import com.example.utils.GetDate;
-import com.example.utils.ReturnData;
+import com.example.common.ReturnData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +35,9 @@ public class RunnerDailyRecordController {
     @PostMapping("/upload")
     @ApiOperation("上传用户的跑步数据")
     public ReturnData uploadRunningData(String userId, @RequestBody RunningData runningData){
-        if (runnerDailyRecordService.uploadRunningData(userId,new GetDate().getToday(),runningData)){
-            return new ReturnData(200,runningData,"success",1);
-        }
-        return new ReturnData(500,"fail","fail",1);
+        runnerDailyRecordService.uploadRunningData(userId,new GetDate().getToday(),runningData);
+        return new ReturnData(200,runningData,"success",1);
+
     }
 
     @PostMapping("/getRecordFromTo")

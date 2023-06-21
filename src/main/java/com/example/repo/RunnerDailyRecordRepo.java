@@ -1,6 +1,7 @@
 package com.example.repo;
 
 import com.example.model.RunnerDailyRecord;
+import com.example.model.RunningData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,10 +15,10 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
     // 根据用户id和日期查询对应数据
     public String getRecordByDay(String userId, Date date);
 
-//    @Query(value = "select id,user_id,path, duration, mile, calorie,average_speed,average_step_frequency,max_speed,max_step_frequency," +
-//            "date,step_frequency,speed,weather,temperature from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)
-    @Query(value = "select * from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)
-    public List<RunnerDailyRecord> getRecordFromTo(String userId, Date from_date,Date to_date);
+    @Query(value = "select  path, duration, mile, calorie,average_speed,average_step_frequency,max_speed,max_step_frequency," +
+            "date,step_frequency,speed,weather,temperature from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)
+//    @Query(value = "select * from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)
+    public List<Map<String,Object>> getRecordFromTo(String userId, Date from_date, Date to_date);
 
     @Query(value = "SELECT t.user_id, t.miles, t.rank, t.avatar_url, t.signature FROM (SELECT u.avatar_url, u.signature,u.user_id, u.miles, @rank \\:= @rank + 1, " +
             "@last_rank \\:= CASE  WHEN @last_score = u.miles  THEN @last_rank  WHEN @last_score \\:= u.miles THEN @rank END AS rank " +
