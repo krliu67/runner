@@ -2,6 +2,7 @@ package com.example.repo;
 
 import com.example.model.RunnerDailyRecord;
 import com.example.model.RunningData;
+import com.example.model.TotalData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,8 +29,7 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
             "(SELECT @rank \\:= 0, @last_score \\:= NULL, @last_rank \\:= 0) r) t limit ?3 , ?4 ", nativeQuery = true)
     public List<Object[]> getAllRankFromTo(Date from_date, Date to_date, Integer start, Integer row);
 
-    @Query( value = "select sum(mile) m, sum(duration) d, sum(calorie) c from runner.runner_daily_record where runner.runner_daily_record.user_id = ?1", nativeQuery = true)
-    public String getTotalData(String userId);
-
-
+    @Query( value = "select sum(mile) totalDistance, sum(duration) totalDuration, sum(calorie) totalConsume from runner.runner_daily_record where runner.runner_daily_record.user_id = ?1", nativeQuery = true)
+//    public String getTotalData(String userId);
+    public List<Map<String,Object>> getTotalData(String userId);
 }
