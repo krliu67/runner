@@ -1,4 +1,4 @@
-package com.example;
+package com.example.controller;
 
 import com.example.common.ReturnData;
 import com.example.model.User;

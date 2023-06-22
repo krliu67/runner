@@ -1,4 +1,4 @@
-package com.example;
+package com.example.controller;
 
 import com.example.dto.RunnerRankDto;
 import com.example.model.RunningData;

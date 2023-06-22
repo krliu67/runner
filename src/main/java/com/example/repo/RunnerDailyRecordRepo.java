@@ -27,6 +27,7 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
             "FROM \n" +
             "runner_daily_record t1, runner.`user` t2 where t1.user_id = t2.user_id and t1.date BETWEEN ?1 and ?2 GROUP BY t1.user_id ORDER BY miles DESC) u, " +
             "(SELECT @rank \\:= 0, @last_score \\:= NULL, @last_rank \\:= 0) r) t limit ?3 , ?4 ", nativeQuery = true)
+
     public List<Object[]> getAllRankFromTo(Date from_date, Date to_date, Integer start, Integer row);
 
     @Query( value = "select sum(mile) totalDistance, sum(duration) totalDuration, sum(calorie) totalConsume from runner.runner_daily_record where runner.runner_daily_record.user_id = ?1", nativeQuery = true)
