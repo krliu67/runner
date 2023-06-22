@@ -10,9 +10,4 @@ public class TotalData implements Serializable {
     private Integer totalDuration;
     private Double totalConsume;
 
-    public TotalData(Double totalDistance, Integer totalDuration, Double totalConsume) {
-        this.totalDistance = totalDistance;
-        this.totalDuration = totalDuration;
-        this.totalConsume = totalConsume;
-    }
 }

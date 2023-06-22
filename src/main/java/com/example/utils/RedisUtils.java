@@ -3,14 +3,13 @@ package com.example.utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
+import com.example.config.RedisConfig;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisUtils {
-
-    @Resource
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
@@ -28,10 +27,10 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value) {
+    public boolean set(final String key, Object value, String time) {
         boolean res = false;
         try {
-            redisTemplate.opsForValue().set(key, value, 3600, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(key, value, Integer.parseInt(time), TimeUnit.SECONDS);
             res = true;
         } catch (Exception e) {
             e.printStackTrace();

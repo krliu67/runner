@@ -22,4 +22,8 @@ public class HomeData implements Serializable {
 
     @ApiModelProperty("單位")
     private String Unit;
+
+
+    public HomeData() {
+    }
 }
