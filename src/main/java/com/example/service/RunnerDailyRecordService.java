@@ -11,11 +11,14 @@ import com.example.repo.RunnerDailyRecordRepo;
 import com.example.utils.BeanMapUtilByJson;
 import com.example.utils.GetDate;
 import com.example.utils.TimeUtils;
+import com.example.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.sql.Array;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +28,9 @@ import java.util.stream.Collectors;
 public class RunnerDailyRecordService {
 
     private final RunnerDailyRecordRepo runnerDailyRecordRepo;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     @Autowired
     public RunnerDailyRecordService(RunnerDailyRecordRepo runnerDailyRecordRepo) {
@@ -86,13 +92,29 @@ public class RunnerDailyRecordService {
         return homeDataList;
     }
 
-    public TotalData getTotalData(String userId){
-        // TODO 先访问redis，如果redis中有数据，则不需要查询mysql
-        String objects = runnerDailyRecordRepo.getTotalData(userId);
-        String[] strs = objects.split(",");
-        // System.out.println(objects); // 861.6,3333,1474.7
-        return new TotalData(Double.parseDouble(strs[0]), Integer.parseInt(strs[1]), Double.parseDouble(strs[2]));
+    public List<TotalData> getTotalData(String userId) {
+        String query_param = "TotalData-" + userId;
+        Object cache_data = redisUtils.get(query_param);
+        if (cache_data != null) {
+            // 如果 Redis 中存在数据，直接返回
+            List<TotalData> totalDataList = (List<TotalData>) cache_data;
+            System.out.println("Redis 中存在数据，直接返回");
+            return totalDataList;
+        } else {
+            //  如果 Redis 中不存在数据，则从 MySQL 查询数据
+            //  进行 MySQL 查询的逻辑
+            //  获取到数据后，将数据存储到 Redis
+            List<Map<String,Object>> records  = runnerDailyRecordRepo.getTotalData(userId);
+            List<TotalData> totalDataList = records.stream().map( data -> {
+                return (TotalData) BeanMapUtilByJson.mapToBean(data,TotalData.class);
+            }).collect(Collectors.toList());
+            System.out.println(totalDataList);
+            redisUtils.set(query_param,totalDataList);
+            System.out.println("从 MySQL 查询数据");
+            return totalDataList;
+        }
     }
+
     public boolean uploadRunningData(String userId, Date date, RunningData runningData){
         RunnerDailyRecord newRecord = new RunnerDailyRecord();
         BeanUtils.copyProperties(runningData,newRecord);
