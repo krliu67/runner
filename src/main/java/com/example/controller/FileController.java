@@ -34,10 +34,9 @@ public class FileController {
         bucketName = StringUtils.hasLength(bucketName) ? bucketName : minioConfig.getDefaultBucketName();
         String objectName = minioUtils.getDatePath() + file.getOriginalFilename();
         minioUtils.upload(bucketName, objectName, file);
-        String viewPath = minioUtils.getPresignedObjectUrl(bucketName, objectName, 60, TimeUnit.SECONDS);
+        String viewPath = minioUtils.getPresignedObjectUrl(bucketName, objectName, 3060, TimeUnit.SECONDS);
         HashMap<String, String> objectInfo = new HashMap<>();
         objectInfo.put("objectName", objectName);
-        //只能预览图片、txt等部分文件
         objectInfo.put("viewPath", viewPath);
         return ResponseEntity.ok(objectInfo);
     }

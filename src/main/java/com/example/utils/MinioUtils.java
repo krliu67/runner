@@ -28,7 +28,7 @@ public class MinioUtils {
 
     /**
      * 获取当前日期字符串格式
-     * @return 2021/12/5
+     * @return
      */
     public String getDatePath() {
         LocalDateTime now = LocalDateTime.now();
@@ -251,7 +251,7 @@ public class MinioUtils {
     }
 
     /**
-     * 获取文件带时效的访问链接   失效时间（以秒为单位），默认是7天不得大于七天
+     * 获取文件带时效的访问链接   失效时间（以秒为单位）
      * @param bucketName     桶名称
      * @param remoteFileName 对象名称
      * @param timeout        时间
