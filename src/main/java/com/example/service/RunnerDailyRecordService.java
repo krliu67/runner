@@ -38,58 +38,71 @@ public class RunnerDailyRecordService {
     }
 
     public List<HomeData> getHomeData(String userId){
-        List<HomeData> homeDataList = new ArrayList<>();
-        java.sql.Date curDate = new GetDate().getToday();
-        java.sql.Date yesDate = new GetDate().getYesterday();
-        String todayRecords = runnerDailyRecordRepo.getRecordByDay(userId,curDate);
-        String yesterdayRecords = runnerDailyRecordRepo.getRecordByDay(userId,yesDate);
-        System.out.println(todayRecords);
-        System.out.println(yesterdayRecords);
-        HomeData mileData = new HomeData();
-        mileData.setSubTitle("里程");
-        mileData.setUnit("公里");
-        HomeData minData = new HomeData();
-        minData.setSubTitle("运动时间");
-        minData.setUnit("分钟");
-        HomeData stepData = new HomeData();
-        stepData.setSubTitle("步频");
-        stepData.setUnit("步");
-        HomeData calorieData = new HomeData();
-        calorieData.setSubTitle("消耗");
-        calorieData.setUnit("消耗");
-        //
-        String[] todayStrs = todayRecords.split(",");
-        String[] yesdayStrs = yesterdayRecords.split(",");
-        if (todayStrs[0].equals("null")){
-            log.info("今天没有运动");
-            throw new DiyException(ErrorType.TODAY_NO_RUN);
-        }else{
-            mileData.setNowValue(Double.parseDouble(todayStrs[0]));
-            long runtime1 = 0L;
-            runtime1 += Long.parseLong(todayStrs[1]);
-            String s1 = new TimeUtils().second2Time(runtime1);
-            minData.setNowValue(s1);
-            stepData.setNowValue(Integer.parseInt(todayStrs[2]));
-            calorieData.setNowValue(Double.parseDouble(todayStrs[3]));
-        }
+        String query_param = "HomeData-" + userId;
+        Object cache_data = redisUtils.get(query_param);
+        if (cache_data != null) {
+            // 如果 Redis 中存在数据，直接返回
+            List<HomeData> homeDataList = (List<HomeData>) cache_data;
+            System.out.println("Redis 中存在数据，直接返回");
+            return homeDataList;
+        } else {
+            //  如果 Redis 中不存在数据，则从 MySQL 查询数据
+            //  进行 MySQL 查询的逻辑
+            //  获取到数据后，将数据存储到 Redis
+            List<HomeData> homeDataList = new ArrayList<>();
+            java.sql.Date curDate = new GetDate().getToday();
+            java.sql.Date yesDate = new GetDate().getYesterday();
+            String todayRecords = runnerDailyRecordRepo.getRecordByDay(userId,curDate);
+            String yesterdayRecords = runnerDailyRecordRepo.getRecordByDay(userId,yesDate);
+            System.out.println(todayRecords);
+            System.out.println(yesterdayRecords);
+            HomeData mileData = new HomeData();
+            mileData.setSubTitle("里程");
+            mileData.setUnit("公里");
+            HomeData minData = new HomeData();
+            minData.setSubTitle("运动时间");
+            minData.setUnit("分钟");
+            HomeData stepData = new HomeData();
+            stepData.setSubTitle("步频");
+            stepData.setUnit("步");
+            HomeData calorieData = new HomeData();
+            calorieData.setSubTitle("消耗");
+            calorieData.setUnit("消耗");
+            String[] todayStrs = todayRecords.split(",");
+            String[] yesdayStrs = yesterdayRecords.split(",");
+            if (todayStrs[0].equals("null")){
+                log.info("今天没有运动");
+                throw new DiyException(ErrorType.TODAY_NO_RUN);
+            }else{
+                mileData.setNowValue(Double.parseDouble(todayStrs[0]));
+                long runtime1 = 0L;
+                runtime1 += Long.parseLong(todayStrs[1]);
+                String s1 = new TimeUtils().second2Time(runtime1);
+                minData.setNowValue(s1);
+                stepData.setNowValue(Integer.parseInt(todayStrs[2]));
+                calorieData.setNowValue(Double.parseDouble(todayStrs[3]));
+            }
 
-        if (yesdayStrs[0].equals("null")){
-            log.info("昨天没有运动");
-            throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
-        }else{
-            mileData.setNowValue(Double.parseDouble(yesdayStrs[0]));
-            long runtime2 = 0L;
-            runtime2 += Long.parseLong(yesdayStrs[1]);
-            String s2 = new TimeUtils().second2Time(runtime2);
-            minData.setNowValue(s2);
-            stepData.setNowValue(Integer.parseInt(yesdayStrs[2]));
-            calorieData.setNowValue(Double.parseDouble(yesdayStrs[3]));
+            if (yesdayStrs[0].equals("null")){
+                log.info("昨天没有运动");
+                throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
+            }else{
+                mileData.setNowValue(Double.parseDouble(yesdayStrs[0]));
+                long runtime2 = 0L;
+                runtime2 += Long.parseLong(yesdayStrs[1]);
+                String s2 = new TimeUtils().second2Time(runtime2);
+                minData.setNowValue(s2);
+                stepData.setNowValue(Integer.parseInt(yesdayStrs[2]));
+                calorieData.setNowValue(Double.parseDouble(yesdayStrs[3]));
+            }
+            homeDataList.add(mileData);
+            homeDataList.add(minData);
+            homeDataList.add(stepData);
+            homeDataList.add(calorieData);
+            redisUtils.set(query_param,homeDataList,"3600");
+            System.out.println("从 MySQL 查询数据");
+            return homeDataList;
         }
-        homeDataList.add(mileData);
-        homeDataList.add(minData);
-        homeDataList.add(stepData);
-        homeDataList.add(calorieData);
-        return homeDataList;
     }
 
     public List<TotalData> getTotalData(String userId) {
@@ -109,7 +122,7 @@ public class RunnerDailyRecordService {
                 return (TotalData) BeanMapUtilByJson.mapToBean(data,TotalData.class);
             }).collect(Collectors.toList());
             System.out.println(totalDataList);
-            redisUtils.set(query_param,totalDataList);
+            redisUtils.set(query_param,totalDataList,"3600");
             System.out.println("从 MySQL 查询数据");
             return totalDataList;
         }
@@ -127,20 +140,46 @@ public class RunnerDailyRecordService {
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
-        // TODO 序列化Json问题
-        List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
-        List<RunningData> runningDataList = records.stream().map( data -> {
-            return (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
-        }).collect(Collectors.toList());
-        return runningDataList;
+        String query_param = "getRecordFromToData-" + userId + "-" +  from_date + "-" + to_date;
+        Object cache_data = redisUtils.get(query_param);
+        if (cache_data != null) {
+            // 如果 Redis 中存在数据，直接返回
+            List<RunningData> runningDataList = (List<RunningData>) cache_data;
+            System.out.println("Redis 中存在数据，直接返回");
+            return runningDataList;
+        } else {
+            //  如果 Redis 中不存在数据，则从 MySQL 查询数据
+            //  进行 MySQL 查询的逻辑
+            //  获取到数据后，将数据存储到 Redis
+            List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
+            List<RunningData> runningDataList = records.stream().map( data -> {
+                return (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
+            }).collect(Collectors.toList());
+            redisUtils.set(query_param,runningDataList,"3600");
+            System.out.println("从 MySQL 查询数据");
+            return runningDataList;
+        }
     }
 
     public List<RunnerRankDto> getAllRankFromTo(Date from_date, Date to_date,Integer start, Integer row){
-
-        List<Object[]> list = runnerDailyRecordRepo.getAllRankFromTo(from_date, to_date,start,row);
-        List<RunnerRankDto> runnerRankDtos = list.stream().map(rank -> {
-            return new RunnerRankDto((String) rank[0], (Double) rank[1], (String) rank[2], (String) rank[3], (String) rank[4]);
-        }).collect(Collectors.toList());
-        return runnerRankDtos;
+        String query_param = "getAllRankFromToData-" + from_date + "-" +  to_date + "-" + start + "-" + row;
+        Object cache_data = redisUtils.get(query_param);
+        if (cache_data != null) {
+            // 如果 Redis 中存在数据，直接返回
+            List<RunnerRankDto> runnerRankDtos = (List<RunnerRankDto>) cache_data;
+            System.out.println("Redis 中存在数据，直接返回");
+            return runnerRankDtos;
+        } else {
+            //  如果 Redis 中不存在数据，则从 MySQL 查询数据
+            //  进行 MySQL 查询的逻辑
+            //  获取到数据后，将数据存储到 Redis
+            List<Object[]> list = runnerDailyRecordRepo.getAllRankFromTo(from_date, to_date,start,row);
+            List<RunnerRankDto> runnerRankDtos = list.stream().map(rank -> {
+                return new RunnerRankDto((String) rank[0], (Double) rank[1], (String) rank[2], (String) rank[3], (String) rank[4]);
+            }).collect(Collectors.toList());
+            redisUtils.set(query_param,runnerRankDtos,"3600");
+            System.out.println("从 MySQL 查询数据");
+            return runnerRankDtos;
+        }
     }
 }

@@ -21,9 +21,9 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
 //    @Query(value = "select * from runner.runner_daily_record where user_id = ?1 and runner_daily_record.date between ?2 and ?3", nativeQuery = true)
     public List<Map<String,Object>> getRecordFromTo(String userId, Date from_date, Date to_date);
 
-    @Query(value = "SELECT t.user_id, t.miles, t.rank, t.avatar_url, t.signature FROM (SELECT u.avatar_url, u.signature,u.user_id, u.miles, @rank \\:= @rank + 1, " +
-            "@last_rank \\:= CASE  WHEN @last_score = u.miles  THEN @last_rank  WHEN @last_score \\:= u.miles THEN @rank END AS rank " +
-            "FROM (SELECT t2.signature, t2.avatar_url, t2.username, t1.user_id, sum(t1.mile) miles \n" +
+    @Query(value = "SELECT t.user_id, t.miles, t.`rank`, t.avatar_url, t.signature FROM (SELECT u.avatar_url, any_value(u.signature),u.user_id, u.miles, @rank \\:= @rank + 1, " +
+            "@last_rank \\:= CASE  WHEN @last_score = u.miles  THEN @last_rank  WHEN @last_score \\:= u.miles THEN @rank END AS `rank` " +
+            "FROM (SELECT any_value(t2.signature), t2.avatar_url, t2.username, t1.user_id, sum(t1.mile) miles \n" +
             "FROM \n" +
             "runner_daily_record t1, runner.`user` t2 where t1.user_id = t2.user_id and t1.date BETWEEN ?1 and ?2 GROUP BY t1.user_id ORDER BY miles DESC) u, " +
             "(SELECT @rank \\:= 0, @last_score \\:= NULL, @last_rank \\:= 0) r) t limit ?3 , ?4 ", nativeQuery = true)
