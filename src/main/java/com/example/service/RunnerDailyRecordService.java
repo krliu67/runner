@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RunnerDailyRecordService {
 
+    private List<String> redis_query = new LinkedList<>();
     private final RunnerDailyRecordRepo runnerDailyRecordRepo;
 
     @Resource
@@ -38,8 +39,9 @@ public class RunnerDailyRecordService {
     }
 
     public List<HomeData> getHomeData(String userId){
-        String query_param = "HomeData-" + userId;
+        String query_param = "userId:" + userId + "-HomeData";
         Object cache_data = redisUtils.get(query_param);
+        redis_query.add(query_param);
         if (cache_data != null) {
             // 如果 Redis 中存在数据，直接返回
             List<HomeData> homeDataList = (List<HomeData>) cache_data;
@@ -106,8 +108,9 @@ public class RunnerDailyRecordService {
     }
 
     public List<TotalData> getTotalData(String userId) {
-        String query_param = "TotalData-" + userId;
+        String query_param = "userId:" + userId + "-TotalData";
         Object cache_data = redisUtils.get(query_param);
+        redis_query.add(query_param);
         if (cache_data != null) {
             // 如果 Redis 中存在数据，直接返回
             List<TotalData> totalDataList = (List<TotalData>) cache_data;
@@ -136,12 +139,16 @@ public class RunnerDailyRecordService {
         runnerDailyRecordRepo.save(newRecord);
         // 上传跑步完成之后数据，上传完成之后需要同时更新⽤⼾的跑步总⾥程、总时间、总消耗
         // 设置删除redis
+        for (String query_param : redis_query) {
+            redisUtils.delete(query_param);
+        }
         return true;
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
-        String query_param = "getRecordFromToData-" + userId + "-" +  from_date + "-" + to_date;
+        String query_param = "userId:" + userId + "-getRecordFromToData";
         Object cache_data = redisUtils.get(query_param);
+        redis_query.add(query_param);
         if (cache_data != null) {
             // 如果 Redis 中存在数据，直接返回
             List<RunningData> runningDataList = (List<RunningData>) cache_data;
