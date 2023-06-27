@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.config.RabbitConfig;
 import com.example.exception.DiyException;
 import com.example.exception.ErrorType;
 import com.example.model.HomeData;
@@ -13,6 +14,7 @@ import com.example.utils.GetDate;
 import com.example.utils.TimeUtils;
 import com.example.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,21 +29,24 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RunnerDailyRecordService {
 
-    private List<String> redis_query = new LinkedList<>();
     private final RunnerDailyRecordRepo runnerDailyRecordRepo;
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    RabbitTemplate rabbitTemplate;
 
     @Autowired
     public RunnerDailyRecordService(RunnerDailyRecordRepo runnerDailyRecordRepo) {
         this.runnerDailyRecordRepo = runnerDailyRecordRepo;
     }
 
-    public List<HomeData> getHomeData(String userId){
-        String query_param = "userId:" + userId + "-HomeData";
+
+    public List<HomeData> getHomeData(String userId) {
+        rabbitTemplate.convertAndSend(RabbitConfig.RUNNER_EXCHANGE,RabbitConfig.RUNNER_QUEUE,userId);
+        String query_param = "HomeData-" + userId;
         Object cache_data = redisUtils.get(query_param);
-        redis_query.add(query_param);
         if (cache_data != null) {
             // 如果 Redis 中存在数据，直接返回
             List<HomeData> homeDataList = (List<HomeData>) cache_data;
@@ -108,9 +113,8 @@ public class RunnerDailyRecordService {
         }
 
     public List<TotalData> getTotalData(String userId) {
-        String query_param = "userId:" + userId + "-TotalData";
+        String query_param = "TotalData-" + userId;
         Object cache_data = redisUtils.get(query_param);
-        redis_query.add(query_param);
         if (cache_data != null) {
             // 如果 Redis 中存在数据，直接返回
             List<TotalData> totalDataList = (List<TotalData>) cache_data;
@@ -138,33 +142,15 @@ public class RunnerDailyRecordService {
         runnerDailyRecordRepo.save(newRecord);
         // 上传跑步完成之后数据，上传完成之后需要同时更新⽤⼾的跑步总⾥程、总时间、总消耗
         // 设置删除redis
-        for (String query_param : redis_query) {
-            redisUtils.delete(query_param);
-        }
         return true;
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
-        String query_param = "userId:" + userId + "-getRecordFromToData";
-        Object cache_data = redisUtils.get(query_param);
-        redis_query.add(query_param);
-        if (cache_data != null) {
-            // 如果 Redis 中存在数据，直接返回
-            List<RunningData> runningDataList = (List<RunningData>) cache_data;
-            System.out.println("Redis 中存在数据，直接返回");
-            return runningDataList;
-        } else {
-            //  如果 Redis 中不存在数据，则从 MySQL 查询数据
-            //  进行 MySQL 查询的逻辑
-            //  获取到数据后，将数据存储到 Redis
-            List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
-            List<RunningData> runningDataList = records.stream().map( data -> {
-                return (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
-            }).collect(Collectors.toList());
-            redisUtils.set(query_param,runningDataList,"3600");
-            System.out.println("从 MySQL 查询数据");
-            return runningDataList;
-        }
+        List<Map<String,Object>> records = runnerDailyRecordRepo.getRecordFromTo(userId,from_date,to_date);
+        List<RunningData> runningDataList = records.stream().map( data -> {
+            return (RunningData) BeanMapUtilByJson.mapToBean(data,RunningData.class);
+        }).collect(Collectors.toList());
+        return runningDataList;
     }
 
     public List<RunnerRankDto> getAllRankFromTo(Date from_date, Date to_date,Integer start, Integer row){

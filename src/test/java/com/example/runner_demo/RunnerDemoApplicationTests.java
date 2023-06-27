@@ -1,5 +1,7 @@
 package com.example.runner_demo;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.example.config.ServerConfig;
 import com.example.dto.RunnerRankDto;
 import com.example.model.RunnerDailyRecord;
 import com.example.model.RunningData;
@@ -17,11 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.DataSource;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.*;
@@ -45,9 +51,15 @@ class RunnerDemoApplicationTests {
     RunnerDailyRecordService runnerDailyRecordService;
 
     @Test
-    void contextLoads() {
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        System.out.println(uuid);
+    public void contextLoads() throws SQLException {
+        //看一下默认数据源
+        System.out.println(dataSource.getClass());
+        //获得连接
+        Connection connection =   dataSource.getConnection();        System.out.println(connection);
+        DruidDataSource druidDataSource = (DruidDataSource) dataSource;        System.out.println("druidDataSource 数据源最大连接数：" + druidDataSource.getMaxActive());
+        System.out.println("druidDataSource 数据源初始化连接数：" + druidDataSource.getInitialSize());
+        //关闭连接
+        connection.close();
     }
 
     @Test
@@ -156,5 +168,10 @@ class RunnerDemoApplicationTests {
             return temp;
         }).collect(Collectors.toList());
         System.out.println(runningDataList);
+    }
+
+    @Test
+    void testIP() throws UnknownHostException {
+        System.out.println(new ServerConfig().getUrl());
     }
 }
