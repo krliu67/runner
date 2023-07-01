@@ -30,5 +30,6 @@ public interface RunnerDailyRecordRepo extends JpaRepository<RunnerDailyRecord,L
     public List<Object[]> getAllRankFromTo(Date from_date, Date to_date, Integer start, Integer row);
 
     @Query( value = "select sum(mile) totalDistance, sum(duration) totalDuration, sum(calorie) totalConsume from runner.runner_daily_record where runner.runner_daily_record.user_id = ?1", nativeQuery = true)
+//    public String getTotalData(String userId);
     public List<Map<String,Object>> getTotalData(String userId);
 }

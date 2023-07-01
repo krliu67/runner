@@ -34,7 +34,6 @@ public class UserService {
         user.setUserId(new GenCode().GenUserId());
         return userRepo.save(user);
     }
-
     public User updateUser(User user){
         return userRepo.save(user);
     }
