@@ -34,7 +34,6 @@ public class UserService {
         user.setUserId(new GenCode().GenUserId());
         return userRepo.save(user);
     }
-
     public User updateUser(User user){
         return userRepo.save(user);
     }
@@ -58,6 +57,7 @@ public class UserService {
         System.out.println(user.toString());
         //2.根据页面提交的用户名username查询数据库
         User realUser = findUserByUserName(user.getUsername());
+        System.out.println(user);
         //3.如果没有查询到则返回登陆失败结果
         if (realUser==null){
             return new ReturnData(0,null,"登录失败，用户不存在",0);
