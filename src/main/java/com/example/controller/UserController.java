@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.common.ReturnData;
+
 import com.example.model.User;
 import com.example.service.UserService;
 import io.swagger.annotations.Api;
@@ -65,7 +66,7 @@ public class UserController {
     }
     // for login in
     @PostMapping("/login")
-    public ReturnData login(HttpServletRequest request, @RequestBody User user){
+    public ReturnData login(HttpServletRequest request, User user){
         return userService.login(request,user);
     }
 

@@ -34,8 +34,8 @@ public class RunnerDailyRecordService {
     @Resource
     private RedisUtils redisUtils;
 
-    @Resource
-    RabbitTemplate rabbitTemplate;
+//    @Resource
+//    RabbitTemplate rabbitTemplate;
 
     @Autowired
     public RunnerDailyRecordService(RunnerDailyRecordRepo runnerDailyRecordRepo) {
@@ -44,7 +44,7 @@ public class RunnerDailyRecordService {
 
 
     public List<HomeData> getHomeData(String userId) {
-        rabbitTemplate.convertAndSend(RabbitConfig.RUNNER_EXCHANGE,RabbitConfig.RUNNER_QUEUE,userId);
+//        rabbitTemplate.convertAndSend(RabbitConfig.RUNNER_EXCHANGE,RabbitConfig.RUNNER_QUEUE,userId);
         String query_param = "HomeData-" + userId;
         Object cache_data = redisUtils.get(query_param);
         if (cache_data != null) {
