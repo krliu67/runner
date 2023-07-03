@@ -22,10 +22,10 @@ public class RunnerDemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(RunnerDemoApplication.class, args);
         String projUrl = new ServerConfig().getUrl();
-        log.info("~ ❤ ~ 项目启动成功 ~ ❤ ~");
-        log.info("项目Swagger地址:"+projUrl+"/swagger-ui/");
-        log.info("项目druid监控地址:"+projUrl+"/druid");
-        log.info("项目rabbitmq监控地址:"+projUrl+"/druid");
+        System.out.println("~ ❤ ~ 项目启动成功 ~ ❤ ~");
+        System.out.println("项目Swagger地址:"+projUrl+":8080/swagger-ui/");
+        System.out.println("项目druid监控地址:"+projUrl+":8080/druid");
+        System.out.println("项目rabbitmq监控地址:"+projUrl+":15672");
     }
 
 }
