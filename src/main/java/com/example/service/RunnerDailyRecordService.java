@@ -14,6 +14,8 @@ import com.example.utils.GetDate;
 import com.example.utils.TimeUtils;
 import com.example.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +36,8 @@ public class RunnerDailyRecordService {
     @Resource
     private RedisUtils redisUtils;
 
-//    @Resource
-//    RabbitTemplate rabbitTemplate;
+    @Resource
+    RabbitTemplate rabbitTemplate;
 
     @Autowired
     public RunnerDailyRecordService(RunnerDailyRecordRepo runnerDailyRecordRepo) {
@@ -134,15 +136,24 @@ public class RunnerDailyRecordService {
             return totalDataList;
         }
     }
-    public boolean uploadRunningData(String userId, Date date, RunningData runningData){
+
+    public void uploadRunningData(String userId, Date date, RunningData runningData){
         RunnerDailyRecord newRecord = new RunnerDailyRecord();
         BeanUtils.copyProperties(runningData,newRecord);
         newRecord.setDate(date);
         newRecord.setUserId(userId);
+        // rabbitmq异步执行
+        log.info("传递uploadRunningData的消息，来自"+userId);
+        rabbitTemplate.convertAndSend(RabbitConfig.RUNNER_EXCHANGE_UploadRunningData,RabbitConfig.RUNNER_QUEUE_UploadRunningData,newRecord);
+    }
+    @RabbitListener(queues = RabbitConfig.RUNNER_QUEUE_UploadRunningData)
+    @RabbitHandler
+    public void uploadRunningData1(RunnerDailyRecord newRecord){
+        log.info("收到uploadRunningData的消息，来自"+newRecord.getUserId());
         runnerDailyRecordRepo.save(newRecord);
         // 上传跑步完成之后数据，上传完成之后需要同时更新⽤⼾的跑步总⾥程、总时间、总消耗
         // 设置删除redis
-        return true;
+//        redisUtils.delete();
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
