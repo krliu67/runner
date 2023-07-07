@@ -153,7 +153,15 @@ public class RunnerDailyRecordService {
         runnerDailyRecordRepo.save(newRecord);
         // 上传跑步完成之后数据，上传完成之后需要同时更新⽤⼾的跑步总⾥程、总时间、总消耗
         // 设置删除redis
-//        redisUtils.delete();
+        List<String> query_params = new ArrayList<>();
+        String query_param_total = "TotalData-" + userId;
+        String query_param_home = "HomeData-" + userId;
+        query_params.add(query_param_total);
+        query_params.add(query_param_home);
+        for (String query : query_params) {
+            redisUtils.delete(query);
+        }
+        return true;
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
