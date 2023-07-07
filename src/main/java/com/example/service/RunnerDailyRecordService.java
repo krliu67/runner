@@ -82,6 +82,7 @@ public class RunnerDailyRecordService {
             if (todayStrs[0].equals("null")) {
                 log.info("今天没有运动");
                 throw new DiyException(ErrorType.TODAY_NO_RUN);
+                //
             } else {
                 mileData.setNowValue(Double.parseDouble(todayStrs[0]));
                 long runtime1 = 0L;
@@ -95,15 +96,16 @@ public class RunnerDailyRecordService {
             if (yesdayStrs[0].equals("null")) {
                 log.info("昨天没有运动");
                 throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
+                //
             } else {
-                mileData.setNowValue(Double.parseDouble(yesdayStrs[0]));
+                mileData.setLastValue(Double.parseDouble(yesdayStrs[0]));
                 long runtime2 = 0L;
                 runtime2 += Long.parseLong(yesdayStrs[1]);
                 String s2 = new TimeUtils().second2Time(runtime2);
-                minData.setNowValue(s2);
-                stepData.setNowValue(Integer.parseInt(yesdayStrs[2]));
-                calorieData.setNowValue(Double.parseDouble(yesdayStrs[3]));
-                }
+                minData.setLastValue(s2);
+                stepData.setLastValue(Integer.parseInt(yesdayStrs[2]));
+                calorieData.setLastValue(Double.parseDouble(yesdayStrs[3]));
+            }
                 homeDataList.add(mileData);
                 homeDataList.add(minData);
                 homeDataList.add(stepData);
