@@ -80,9 +80,12 @@ public class RunnerDailyRecordService {
             String[] todayStrs = todayRecords.split(",");
             String[] yesdayStrs = yesterdayRecords.split(",");
             if (todayStrs[0].equals("null")) {
-                log.info("今天没有运动");
-                throw new DiyException(ErrorType.TODAY_NO_RUN);
-                //
+                log.info(userId + "今天没有运动");
+                // throw new DiyException(ErrorType.TODAY_NO_RUN);
+                mileData.setNowValue(0.00);
+                minData.setNowValue(0.00);
+                stepData.setNowValue(0.00);
+                calorieData.setNowValue(0.00);
             } else {
                 mileData.setNowValue(Double.parseDouble(todayStrs[0]));
                 long runtime1 = 0L;
@@ -94,9 +97,12 @@ public class RunnerDailyRecordService {
             }
 
             if (yesdayStrs[0].equals("null")) {
-                log.info("昨天没有运动");
-                throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
-                //
+                log.info(userId + "昨天没有运动");
+                // throw new DiyException(ErrorType.YESTERDAY_NO_RUN);
+                mileData.setLastValue(0.00);
+                minData.setLastValue(0.00);
+                stepData.setLastValue(0.00);
+                calorieData.setLastValue(0.00);
             } else {
                 mileData.setLastValue(Double.parseDouble(yesdayStrs[0]));
                 long runtime2 = 0L;
@@ -155,6 +161,7 @@ public class RunnerDailyRecordService {
         runnerDailyRecordRepo.save(newRecord);
         // 上传跑步完成之后数据，上传完成之后需要同时更新⽤⼾的跑步总⾥程、总时间、总消耗
         // 设置删除redis
+        String userId = newRecord.getUserId();
         List<String> query_params = new ArrayList<>();
         String query_param_total = "TotalData-" + userId;
         String query_param_home = "HomeData-" + userId;
@@ -163,7 +170,7 @@ public class RunnerDailyRecordService {
         for (String query : query_params) {
             redisUtils.delete(query);
         }
-        return true;
+
     }
 
     public List<RunningData> getRecordFromTo(String userId, Date from_date, Date to_date){
