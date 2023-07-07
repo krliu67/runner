@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,8 @@ public class RabbitConfig implements InitializingBean {
     private RabbitTemplate rabbitTemplate;
     public final static String RUNNER_EXCHANGE = "RUNNER_EXCHANGE";
     public final static String RUNNER_QUEUE = "RUNNER_QUEUE";
+    public final static String RUNNER_EXCHANGE_UploadRunningData = "RUNNER_EXCHANGE_UploadRunningData";
+    public final static String RUNNER_QUEUE_UploadRunningData = "RUNNER_QUEUE_uploadRunningData";
     public final static String RUNNER_ROUTING_KEY = "RUNNER_ROUTING_KEY";
     /**
      * 消息
@@ -36,9 +39,21 @@ public class RabbitConfig implements InitializingBean {
         return new Queue(RUNNER_QUEUE,true,false,false);
     }
     @Bean
-    public Binding queueBinding(Queue queue, FanoutExchange fanoutExchange){
+    public FanoutExchange getRunnerUploadRunningDataExchange() {
+        return new FanoutExchange(RUNNER_EXCHANGE_UploadRunningData,true,false);
+    }
+    @Bean
+    public Queue getRunnerUploadRunningDataQueue(){
+        return new Queue(RUNNER_QUEUE_UploadRunningData,true,false,false);
+    }
+    @Bean
+    public Binding queueBinding1(@Qualifier("getRunnerQueue") Queue queue, @Qualifier("getRunnerExchange") FanoutExchange fanoutExchange){
         return BindingBuilder.bind(queue).to(fanoutExchange);
-//        return BindingBuilder.bind(queue).to(fanoutExchange).with();
+    }
+
+    @Bean
+    public Binding queueBinding2(@Qualifier("getRunnerUploadRunningDataQueue") Queue queue, @Qualifier("getRunnerUploadRunningDataExchange") FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(queue).to(fanoutExchange);
     }
 
     @Override
